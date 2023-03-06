@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+
+    <!-- SideNav -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidenav/sidenavstyle.css') }}">
+    <script src="{{ url_for('static',filename='sidenav/sidenavlogic.js') }}"></script>
+
+    <!-- Chosen -->
+    <script src="{{ url_for('static',filename='chosen.jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='component-chosen.min.css') }}">
+
+    <!-- Experiment Logic -->
+    <script src="{{ url_for('static',filename='experiment/experiment-logic.js') }}"></script>
+
+    <!-- JS Templating using Handlebars -->
+    <script src="{{ url_for('static',filename='handlebars.min-v4.7.7.js') }}"></script>
+
+</head>
+<body>
+<!-- Intended to be a basis for the websites to come -->
+
+<div class="container-fluid">
+    <div class="col-md-8 offset-md-2">
+        {% include 'sidenav/sidenav.html' %}
+        <div class="row">
+            <div class="col mt-5">
+                <h1>Experiments</h1>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-2">
+            <div class="col">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createExperimentModal"
+                        data-fields="plain">
+                    Add new Experiment
+                </button>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-between mb-2">
+            <div class="col-sm-12 "> <!-- col-md-8 -->
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Search:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Name | Sources | Owner "
+                           aria-label="Username"
+                           aria-describedby="basic-addon1" id="searchFieldInput">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered table-sm" id="table">
+                    <thead class="thead-light">
+                    <tr class="">
+                        <th scope="col" class="">Name</th>
+                        <th scope="col" class="">Sources</th>
+                        <th scope="col" class="d-none d-md-table-cell">Owner</th>
+                    </tr>
+                    </thead>
+                    <tbody id="collectionViewBody">
+                    <!-- These need to be loaded in dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals --->
+<!-- Manage Sharing: -->
+<div class="modal fade" id="manageExperimentSharing" tabindex="-1" role="dialog"
+     aria-labelledby="manageExperimentSharing" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form id="manageExperimentSharingForm">
+                <div class="modal-body">
+                    <select id="manageShareSelector" class="form-control form-control-chosen"
+                            data-placeholder="Select users to share..." multiple>
+                        <option></option>
+                        <option value="1">Ada Lovelace</option>
+                        <option value="2">Steve Wozniak</option>
+                        <option value="3">Margaret Hamilton</option>
+                        <option value="4">Grace Hopper</option>
+                        <option value="5">Bill Gates</option>
+                        <option value="6">Elon Musk</option>
+                    </select>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Selection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteExperimentModal" tabindex="-1" role="dialog"
+     aria-labelledby="deleteExperimentModal"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="deleteExperiment">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h6>Are you sure you want to delete the Experiment?</h6>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-success " id = "deleteExperiment">Yes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Create Experiment Modal -->
+<div class="modal fade" id="createExperimentModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form class="needs-validation" id="createExperiment" novalidate>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="text-center text-primary">
+                            <th>Create Experiment</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div class="form-row align-items-center">
+                                    <div class="col-auto">
+                                        <label class="col-form-label" for="experimentName">Name:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="text" class="form-control" id="experimentName" required>
+                                        <div class="invalid-feedback" id="experimentNameInvalidFeedback">
+                                            Please enter a Valid Name
+                                        </div>
+                                        <div class="valid-feedback" id="experimentNameValidFeedback">
+                                            Looks good!
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Model</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-row align-items-center">
+                                    <div class="col-12">
+                                        <select name="modal_selector" id="modalSelector"
+                                                class="form-control form-control-chosen form-control-chosen-required"
+                                                data-placeholder="Please select..." required>
+                                            <option></option>
+                                        </select>
+                                        <div class="invalid-feedback" id="modalSelectorInvalidFeedback">
+                                            You need to select a Modal!
+                                        </div>
+                                        <div class="valid-feedback" id="modalSelectorValidFeedback">
+                                            Looks good!
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Share</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select id="shareSelector" class="form-control form-control-chosen"
+                                        data-placeholder="Select users to share..." multiple>
+                                    <option></option>
+                                    <!-- Add these Dynamically (Scales terrible) -->
+                                    <!-- value will be the thing handed to the back end  -->
+                                    <option value="1">Ada Lovelace</option>
+                                    <option value="2">Steve Wozniak</option>
+                                    <option value="3">Margaret Hamilton</option>
+                                    <option value="4">Grace Hopper</option>
+                                    <option value="5">Bill Gates</option>
+                                    <option value="6">Elon Musk</option>
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="row justify-content-between">
+                        <button type="button" class="btn btn-danger col-md-auto cpm-12  mb-2"
+                                data-dismiss="modal">Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success col-md-auto col-12">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% raw %}
+<script id="experimentCollectionView" type="text/x-handlebars-template">
+    {{#each experiment}}
+        <tr class="experimentRow" id="row{{@index}}" data-toggle="collapse" data-target="#collapseRow{{@index}}"
+            style="cursor:pointer">
+            <td class="">{{experimentName}}</td>
+            <td class="">{{model}}</td>
+            {{#if  originalOwner}}
+                <td class="d-none d-md-table-cell">{{originalOwner}}</td>
+            {{/if}}
+            {{#unless originalOwner}}
+                <td class="d-none d-md-table-cell">You</td>
+            {{/unless}}
+        </tr>
+        <tr id="collapseRow{{@index}}" class="collapse" data-parent="#accordion">
+            <td colspan="4" class="p-3">
+                <!-- Start Representation Experiment -->
+                <div class="row justify-content-between">
+                    <h6 class=""><span class="text-secondary mr-2">Name:</span>{{experimentName}}</h6>
+                </div>
+                <div class="row justify-content-between">
+                    <h6 class=""><span class="text-secondary mr-2">Model:</span>{{model}}</h6>
+                </div>
+                <div class="row d-flex align-items-center justify-content-between">
+                    {{#if  originalOwner}}
+                        <h6>
+                            <span class="text-secondary mr-2">Shared with you by:</span>{{originalOwner}}
+                        </h6>
+                    {{/if}}
+                    {{#unless originalOwner}}
+                        <h6>
+                            <span class="text-secondary mr-2">Shared with:</span>{{numberShared}}
+                        </h6>
+                        <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                data-toggle="modal"
+                                data-target="#manageExperimentSharing"
+                                data-scenario-name="{{scenarioName}}"
+                                data-scenario-id="{{sId}}"
+                                data-model-name="{{model}}"
+                                data-Experiment-id={{experimentId}}>
+                            Manage Sharing
+                        </button>
+                    {{/unless}}
+                </div>
+                <hr>
+                <div class="text-warning d-block d-md-none text-center md-2">
+                    NOTE: The visualisation is best viewed on a bigger screen
+                </div>
+                <div class="row justify-content-between">
+                    <!-- TODO Fix this to redirect with the info -->
+                    <a class="btn btn-success btn-sm col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                       href="/user/experiments/visualization?model-name={{model}}&scenario-name={{scenarioName}}&s-id={{sId}}&experiment-id={{experimentId}}&generalization={{generalizationType}}"
+                    data-scenario-name="{{scenarioName}}"
+                    data-scenario-id="{{sId}}"
+                    data-model-name="{{model}}"
+                    data-generalization="{{generalizationType}}"
+                    data-experiment-id={{experimentId}}>
+                    View Experiment
+                    </a>
+                    {{#unless  originalOwner}}
+                        <button class="btn btn-danger btn-sm col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                data-toggle="modal"
+                                data-target="#deleteExperimentModal"
+                                data-scenario-name="{{scenarioName}}"
+                                data-scenario-id="{{sId}}"
+                                data-model-name="{{model}}"
+                            data-experiment-id={{experimentId}}>
+                        Delete
+                    </button>
+                    {{/unless}}
+                </div>
+                <!-- End Representation Experiment -->
+            </td>
+        </tr>
+    {{/each}}
+</script>
+{% endraw %}
+</body>
+</html>
+

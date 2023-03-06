@@ -1,0 +1,57 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<style>
+    #wrapper{padding:90px 15px;}
+    .navbar-expand-lg .navbar-nav.side-nav{flex-direction: column;}
+    .card{margin-bottom: 15px; border-radius:0; box-shadow: 0 3px 5px rgba(0,0,0,.1); }
+    .header-top{box-shadow: 0 3px 5px rgba(0,0,0,.1)}
+    @media(min-width:992px) {
+        #wrapper{padding: 90px 15px 15px 75px; }
+        .navbar-nav.side-nav:hover {left:0;}
+        .side-nav li a {padding: 20px}
+        .navbar-nav li a .shortmenu {float: right;display: block;opacity: 1}
+        .navbar-nav.side-nav:hover li a .shortmenu{opacity: 0}
+        .navbar-nav.side-nav{background: #d3d9df;box-shadow: 2px 1px 2px rgba(0,0,0,.1);position:fixed;top:0px;flex-direction: column!important;left:-140px;width:200px;overflow-y:auto;bottom:0;overflow-x:hidden;padding-bottom:40px}
+    }
+    .animate{-webkit-transition:all .2s ease-in-out;-moz-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;-ms-transition:all .2s ease-in-out;transition:all .2s ease-in-out}
+    .navbar-nav li a svg{font-size: 25px;float: left;margin: 0 10px 0 5px;}
+    .side-nav li { border-bottom: 1px solid #50575d;}
+</style>
+
+<body>
+<div id="wrapper" class="animate">
+    <nav class="navbar fixed-top navbar-expand-lg bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav animate side-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/user" title="Earheart"><i class="fab fa-wpexplorer"></i> Earheart <i class="fab fa-wpexplorer shortmenu animate"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/datasets" title="Datasets"><i class="fas fa-database"></i> Datasets <i class="fas fa-database shortmenu animate"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/scenarios" title="Scenarios"><i class="fas fa-cube"></i> Scenarios <i class="fas fa-cube shortmenu animate"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/model" title="Models"><i class="fas fa-chart-bar"></i> Models <i class="fas fa-chart-bar shortmenu animate"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" title="Experiments"><i class="fas fa-flask"></i> Experiments <i class="fas fa-flask shortmenu animate"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" title="Settings"><i class="fas fa-cogs"></i> Settings <i class="fas fa-cogs shortmenu animate"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout" title="Sing out"><i class="fas fa-sign-out-alt"></i> Sign Out <i class="fas fa-sign-out-alt shortmenu animate"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+

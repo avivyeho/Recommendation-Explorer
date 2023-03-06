@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+</head>
+<style>
+    .body {
+    box-shadow: 0px 0px 5px 5px lightgray;
+    }
+
+    input[type=text], input[type=password] {
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px 20px;
+        display: inline-block;
+        box-sizing: border-box;
+    }
+
+</style>
+<script>
+
+
+    function LoginValidation() {
+        var result = [];
+        let email = $("#Email").val();
+        let password = $("#Password").val();
+        $.ajax({
+            url: "/API/login",
+            method: "POST",
+            timeout: 0,
+            headers: {"Content-Type": "application/json"},
+            data: JSON.stringify({'email': email, 'password': password}),
+            async: false,
+            success: function (data) {
+                items = data
+            }
+        });
+        result = items;
+        console.log(result);
+
+        if (result["message"] === "email and/or password in incorrect") {
+            alert("Email and/or password is incorrect");
+        } else {
+            alert("Logged in successfully")
+            window.location.replace("/user");
+        }
+    }
+
+
+    $(document).ready(function() {
+        $("#LoginForm").on("submit", function(event){
+            console.log("Entered: Login on submit");
+            event.preventDefault();
+            LoginValidation();
+        });
+
+
+    });
+
+
+</script>
+<body>
+{% include 'header.html' %}
+{% if current_user.is_authenticated %}
+    <script> window.location.replace("/user")</script>
+    {% endif %}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-4"></div>
+        <div class="col-md-6 col-lg-4 body">
+            <form id="LoginForm" action="/API/login" method="post">
+                <label class="col-sm-12 col-form-label" for="Email">Email </label>
+                <div class="col-sm-12 col-form-label">
+                    <input type="text" placeholder="Enter Email" id="Email" required
+                           style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;" class="form-control">
+                </div>
+                <div class="col-sm-12 col-form-label"><a class="float-right" href="#">Forgot password?</a>
+                    <label>Password</label>
+                    <input type="password" placeholder="Enter Password" name="password" id="Password" required
+                           style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;" class="form-control">
+                </div>
+                <div class="col-sm-12">
+                    <button type="submit" class="btn btn-primary col-sm-12" style="text-align: center;">Login</button>
+                </div>
+                <div class="col-sm-12 ">
+                    <div class="text-center">
+                        <p>Don't have an account?<a href="/signup" style="text-decoration-color: dodgerblue;"> Sign up</a></p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+
+

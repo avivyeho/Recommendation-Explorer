@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="../static/bootstrap-4.0.0.min.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- SideNav -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidenav/sidenavstyle.css') }}">
+    <script src="{{ url_for('static',filename='sidenav/sidenavlogic.js') }}"></script>
+
+    <!-- Chosen -->
+    <script src="{{ url_for('static',filename='chosen.jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='component-chosen.min.css') }}">
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static',filename='dataset/dataset-logic.js') }}"></script>
+
+    <!-- JS Templating using Handlebars -->
+    <script src="{{ url_for('static',filename='handlebars.min-v4.7.7.js') }}"></script>
+
+</head>
+<body>
+
+<div class="container-fluid">
+    {% include 'sidenav/sidenav.html' %}
+    <div class="col-md-8 offset-md-2">
+        <div class="row">
+            <div class="col mt-5">
+                <h1>Datasets</h1>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-2">
+            <div class="col">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createDatasetModal"
+                        data-fields="plain">Add new dataset
+                </button>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-between mb-2">
+            <div class="col-sm-12"> <!-- col-md-8 -->
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Search:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Name | Date | Owner" aria-label="Username"
+                           aria-describedby="basic-addon1" id="searchFieldInput">
+                </div>
+            </div>
+            <div> <!-- This one works magic for some reason XD -->
+                <!-- Optional
+                <div class="col-md-4">
+
+                    <div class="dropdown show">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Sort by
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item" href="#">Name</a>
+                            <a class="dropdown-item" href="#">Size: Ascending</a>
+                            <a class="dropdown-item" href="#">Size: Descending</a>
+                            <a class="dropdown-item" href="#">Date: Newest First</a>
+                            <a class="dropdown-item" href="#">Date: Oldest First</a>
+                            <a class="dropdown-item" href="#">...</a>
+                        </div>
+                    </div>
+                </div>
+                 -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="not-accordion">
+                    <table class="table table-sm table-bordered mb-0" id="table">
+                        <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Owner</th>
+                            <!-- Optional <th scope="col">Size</th> -->
+                        </tr>
+                        </thead>
+                        <tbody id="collectionViewBody">
+                        <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals --->
+<!-- Change Name Modal -->
+<div class="modal fade" id="changeDatasetNameModal" tabindex="-1" role="dialog"
+     aria-labelledby="changeDatasetNameModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="changeNameForm" novalidate>
+                <div class="modal-body">
+                    <div class="row">
+                        <h6 class=""><span class="text-secondary mr-2">Current Name:</span><span id="currentName">Dataset Name</span>
+                        </h6>
+                    </div>
+                    <div class="row">
+                        <input type="text" class="form-control" id="newDatasetNameInput"
+                               placeholder="New Dataset Name" required>
+                        <div class="invalid-feedback" id="newDatasetNameInvalidFeedback">
+                            Please enter a Valid Name.
+                        </div>
+                        <div class="valid-feedback" id="newDatasetNameValidFeedback">
+                            Looks good!
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteDatasetModal" tabindex="-1" role="dialog"
+     aria-labelledby="deleteDatasetModal"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h6>Are you sure you want to delete the Dataset?</h6>
+                <h6><span class="text-secondary mr-2">Scenarios using this:</span><span id="referenceValue"></span>
+                </h6>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    No
+                </button>
+                <button id="confirmDeleteDataset" type="button" class="btn btn-success">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Show Interaction Sample -->
+<div class="modal fade" id="showDatasetInteraction" tabindex="-1" role="dialog"
+     aria-labelledby="showDatasetInteraction" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sample</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" id="interactionSampleBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Show Metadata Sample -->
+<div class="modal fade" id="showMetaDataSample" tabindex="-1" role="dialog"
+     aria-labelledby="showMetaDataSample" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sample</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" id="metaSampleBody">
+                <i>Yet to come</i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Labels Modal: Optional -->
+<div class="modal fade" id="changeDatasetLabelsModal" tabindex="-1" role="dialog"
+     aria-labelledby="changeDatasetLabelsModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h6>Labels are for later</h6>
+                <!-- List of labels that can be selected -->
+                <!-- New Label generation -->
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Sharing: -->
+<div class="modal fade" id="manageDatasetSharing" tabindex="-1" role="dialog"
+     aria-labelledby="showDatasetInteraction" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form id="manageDatasetSharingForm">
+                <div class="modal-body">
+                    <select id="manageShareSelector" class="form-control form-control-chosen"
+                            data-placeholder="Select users to share..." multiple>
+                        <option></option>
+                        <!-- Add these Dynamically (Scales terrible) -->
+                        <!-- value will be the thing handed to the back end  -->
+                        <option value="1">Ada Lovelace</option>
+                        <option value="2">Steve Wozniak</option>
+                        <option value="3">Margaret Hamilton</option>
+                        <option value="4">Grace Hopper</option>
+                        <option value="5">Bill Gates</option>
+                        <option value="6">Elon Musk</option>
+                    </select>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Selection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Dataset Modal -->
+<div class="modal fade" id="createDatasetModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <!-- Begin Create Dataset From -->
+                <form class="needs-validation" id="createDataset" novalidate>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="text-center text-primary">
+                            <th>Create Dataset</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div class="form-row align-items-center">
+                                    <div class="col-auto">
+                                        <label class="col-form-label" for="datasetName">Name:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="text" class="form-control" id="datasetName" required>
+                                        <div class="invalid-feedback" id="datasetNameInvalidFeedback">
+                                            Please enter a Valid Name
+                                        </div>
+                                        <div class="valid-feedback" id="datasetNameValidFeedback">
+                                            Looks good!
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Interactions</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="interactionFile" required>
+                                    <label class="custom-file-label" for="interactionFile" id="interactionFileLabel">Choose
+                                        interactions file</label>
+                                    <div class="invalid-feedback" id="interactionFileInvalidFeedback">Please select a
+                                        valid file
+                                    </div>
+                                    <div class="valid-feedback" id="interactionFileValidFeedback">Looks good!</div>
+                                </div>
+                                <div class="input-group mt-3" style="display:none;" id="userIdSection">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="userIdSelect">user_id:</label>
+                                    </div>
+                                    <select class="custom-select column-meaning-select" id="userIdSelect" required>
+                                        <option selected disabled hidden>Select column...</option>
+                                        <option class="option1" value="0">userId</option>
+                                        <option class="option2" value="1">movieId</option>
+                                        <option class="option3" value="2" disabled hidden>timestamp</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="userIdSelectInvalidFeedback">Please select a
+                                        column
+                                    </div>
+                                    <div class="valid-feedback" id="userIdSelectValidFeedback">Looks good!</div>
+                                </div>
+                                <div class="input-group mt-3" style="display:none;" id="itemIdSection">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="itemIdSelect">item_id:</label>
+                                    </div>
+                                    <select class="custom-select column-meaning-select" id="itemIdSelect" required>
+                                        <option selected disabled hidden>Select column...</option>
+                                        <option class="option1" value="0">userId</option>
+                                        <option class="option2" value="1">movieId</option>
+                                        <option class="option3" value="2" disabled hidden>timestamp</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="itemIdSelectInvalidFeedback">Please select a
+                                        column
+                                    </div>
+                                    <div class="valid-feedback" id="itemIdSelectValidFeedback">Looks good!</div>
+                                </div>
+                                <div class="input-group mt-3" style="display:none;" id="timestampSection">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="timestampSelect">timestamp:</label>
+                                    </div>
+                                    <select class="custom-select column-meaning-select" id="timestampSelect">
+                                        <option selected disabled hidden>Select column...</option>
+                                        <option class="option1" value="0">userId</option>
+                                        <option class="option2" value="1">movieId</option>
+                                        <option class="option3" value="2" disabled hidden>timestamp</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="timestampSelectInvalidFeedback">Please select a
+                                        column
+                                    </div>
+                                    <div class="valid-feedback" id="timestampSelectValidFeedback">Looks good!</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Metadata</th>
+                        </tr>
+                        <tr>
+                            <td id="metaSection">
+                                <div id="metadataFilesSection"></div>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="metadataFile">
+                                        <label class="custom-file-label" for="metadataFile" id="metadataFileLabel">Choose
+                                            Metadata
+                                            file</label>
+                                        <div class="invalid-feedback" id="metadataFileInvalidFeedback">Please select a
+                                            valid file
+                                        </div>
+                                        <div class="valid-feedback" id="metadataFileValidFeedback">Looks good!</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Representation</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="textRepresentationSelector">Text
+                                            Representation</label>
+                                    </div>
+                                    <select id="textRepresentationSelector" class="form-control form-control-chosen"
+                                            data-placeholder="Select a column ..." required>
+                                        <option></option>
+                                    </select>
+                                    <div class="invalid-feedback" id="metadataFileInvalidFeedback">Please select a
+                                        column
+                                    </div>
+                                    <div class="valid-feedback" id="metadataFileValidFeedback">Looks good!</div>
+                                </div>
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="imgRepresentationSelector">Image
+                                            Representation</label>
+                                    </div>
+                                    <select id="imgRepresentationSelector"
+                                            class="form-control form-control-chosen-optional"
+                                            data-placeholder="Select a column ...">
+                                        <option></option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Share</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <select id="shareSelector" class="form-control form-control-chosen"
+                                        data-placeholder="Select users to share..." multiple>
+                                    <option></option>
+                                    <!-- Add these Dynamically (Scales terrible) -->
+                                    <!-- value will be the thing handed to the back end  -->
+                                    <option value="1">Ada Lovelace</option>
+                                    <option value="2">Steve Wozniak</option>
+                                    <option value="3">Margaret Hamilton</option>
+                                    <option value="4">Grace Hopper</option>
+                                    <option value="5">Bill Gates</option>
+                                    <option value="6">Elon Musk</option>
+                                </select>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="row justify-content-between">
+                        <button type="button" class="btn btn-danger col-md-auto cpm-12 mb-2" data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success col-md-auto col-12" id="createButton">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template -->
+{% raw %}
+<script id="sampleCollectionView" type="text/x-handlebars-template">
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+        <thead>
+        <tr>
+            {{#each header}}
+                <th>{{this}}</th>
+            {{/each}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each row}}
+            <tr>
+                {{#each value}}
+                    {{#if data-type}}
+                        <td><img src="{{this.val}}" alt="{{this.val}}" width="200"></td>
+                    {{/if}}
+                    {{#unless  data-type}}
+                        <td class="tdleft">{{this.val}}</td>
+                    {{/unless }}
+                {{/each}}
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    </div>
+</script>
+
+<script id="datasetCollectionView" type="text/x-handlebars-template">
+    {{#each dataset}}
+        <tr id="row{{@index}}" data-toggle="collapse" data-target="#collapseRow{{@index}}"
+            style="cursor:pointer" class="datasetRow">
+            <td class="border-bottom">{{datasetName}}</td>
+            <td class=" border-bottom ">{{date}}</td>
+            {{#if  originalOwner}}
+                <td class="d-none d-md-table-cell">{{originalOwner}}</td>
+            {{/if}}
+            {{#unless originalOwner}}
+                <td class="d-none d-md-table-cell">You</td>
+            {{/unless}}
+            <!-- Optional <td class="border-bottom">{ {size} }</td> -->
+        </tr>
+        <tr id="collapseRow{{@index}}" class="collapse" data-parent="#accordion">
+            <td colspan="4" class=" p-3">
+                <!-- Representation of a Dataset -->
+                <table class="table table-sm mb-0">
+                    <tbody>
+                    <!-- General information -->
+                    <tr class="text-primary scenario-collapse-toggles" id="headingGeneralInfo{{@index}}"
+                        data-toggle="collapse" data-target="#collapseGeneralInfo{{@index}}"
+                        style="cursor:pointer">
+                        <th>
+                            <div class="row justify-content-between">
+                                <span>General info</span><span class="mr-1" id="icon">-</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr id="collapseGeneralInfo{{@index}}" class="collapse show collapse-with-indicator">
+                        <td>
+                            <div class="row justify-content-between form-inline mb-md-auto mb-2">
+                                {{#unless originalOwner}}
+                                    <h6 class="mt-2"><span class="text-secondary mr-2">Source:</span>{{datasetName}}
+                                    </h6>
+                                    <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                            data-toggle="modal"
+                                            data-target="#changeDatasetNameModal"
+                                            data-dataset-id={{datasetId}}
+                                            data-name="{{datasetName}}">
+                                        Change Name
+                                    </button>
+                                {{/unless}}
+                            </div>
+                            <div class="row">
+                                <h6 class="text-secondary mr-2">Created:</h6><h6>{{date}}</h6>
+                            </div>
+                            <!-- Optional feature
+                            <div class="row d-flex align-items-center justify-content-between mb-md-auto mb-2">
+                                <h6>
+                                    <span class="text-secondary mr-2">Labels:</span>
+                                    <span class="badge badge-pill badge-secondary">Project #1</span>
+                                    <span class="badge badge-pill badge-secondary">Demo</span>
+                                </h6>
+                                <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                        data-toggle="modal"
+                                        data-target="#changeDatasetLabelsModal">Change Labels
+                                </button>
+                            </div>
+                            -->
+                            <div class="row d-flex align-items-center justify-content-between mb-md-auto mb-2">
+                                {{#if  originalOwner}}
+                                    <h6>
+                                        <span class="text-secondary mr-2">Shared with you by:</span>{{originalOwner}}
+                                    </h6>
+                                {{/if}}
+                                {{#unless originalOwner}}
+                                    <h6>
+                                        <span class="text-secondary mr-2">Shared with:</span>{{numberShared}}
+                                    </h6>
+                                    <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                            data-toggle="modal"
+                                            data-target="#manageDatasetSharing"
+                                            data-dataset-id={{datasetId}}>
+                                        Manage Sharing
+                                    </button>
+                                {{/unless}}
+                            </div>
+                            <div class="row">
+                                <h6><span class="text-secondary mr-2">Scenarios using this:</span>{{numberReferences}}
+                                </h6>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Statistics -->
+                    <tr class="text-primary" id="headingStatistics{{@index}}"
+                        data-toggle="collapse" data-target="#collapseStatistics{{@index}}" style="cursor:pointer">
+                        <th>
+                            <div class="row justify-content-between">
+                                <span>Statistics</span><span class="mr-1" id="icon">+</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr id="collapseStatistics{{@index}}" class="collapse collapse-with-indicator">
+                        <td>
+                            <h6 class="text-secondary">Quantities</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Total Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Interactions</td>
+                                    <td>{{totalInteractions}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Products</td>
+                                    <td>{{totalProducts}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Users</td>
+                                    <td>{{totalUsers}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <!-- Optional remove space between { { and add the values to the json
+                            <h6 class="text-secondary">Ranges</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Min</th>
+                                    <th>Max</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Interactions per Product</td>
+                                    <td>{ {interactionsPerProductMin}}</td>
+                                    <td>{ {interactionsPerProductMax}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Users per Product</td>
+                                    <td>{ {usersPerProductMin}}</td>
+                                    <td>{ {usersPerProductMax}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Interactions per User</td>
+                                    <td>{ {interactionsPerUserMin}}</td>
+                                    <td>{ {interactionsPerUserMax}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Products per User</td>
+                                    <td>{ {productsPerUserMin}}</td>
+                                    <td>{ {productsPerUserMax}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Interactions per Moment</td>
+                                    <td>{ {interactionsPerMomentMin}}</td>
+                                    <td>{ {interactionsPerMomentMax}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            -->
+                            <button class="btn btn-primary col-md-auto col-sm-12 mb-md-auto mb-2 btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#showDatasetInteraction"
+                                    data-dataset-id={{datasetId}}>
+                                Show Interactions Sample
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Metadata -->
+                    {{#if  metaFile}}
+                        <tr class="text-primary scenario-collapse-toggles" id="headingMetadata{{@index}}"
+                            data-toggle="collapse" data-target="#collapseMetadata{{@index}}"
+                            style="cursor:pointer">
+                            <th>
+                                <div class="row justify-content-between">
+                                    <span>Metadata</span><span class="mr-1" id="icon">+</span>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr id="collapseMetadata{{@index}}" class="collapse collapse-with-indicator">
+                        <td>
+                            {{#each metaFile}}
+                                <div class="row justify-content-between form-inline mb-2 mt-2">
+                                    <h6 class="mt-2"><span class="text-secondary mr-2">Name:</span>{{fileName}}
+                                    </h6>
+                                    <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary" data-toggle="modal"
+                                            data-target="#showMetaDataSample" data-meta-file-name="{{fileName}}"
+                                            data-dataset-id={{../datasetId}}>
+                                        Show Sample
+                                    </button>
+                                </div>
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Meaning</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{#each column}}
+                                        <tr>
+                                            <th scope="row">{{@index}}</th>
+                                            <td>{{type}}</td>
+                                            <td>{{meaning}}</td>
+                                        </tr>
+                                    {{/each}}
+                                    </tbody>
+                                </table>
+                            {{/each}}
+                        </td>
+                        </tr>
+                    {{/if}}
+                    <!-- Buttons -->
+                    <tr>
+                        <td>
+                            <div class="row justify-content-between">
+                                <button class="btn btn-success col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                        onClick="location.href='/user/scenarios?create={{datasetId}}'">
+                                Create Scenario
+                                </button>
+                                <!-- Optional Feature
+                                <button class="btn btn-success col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                        data-toggle="modal" data-target="#addDatasetMetadata">
+                                    Add Metadata
+                                </button>
+                                -->
+                                <button class="btn btn-danger col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                        data-toggle="modal"
+                                        data-target="#deleteDatasetModal"
+                                        data-dataset-id={{datasetId}}>
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!-- End Representation Dataset -->
+            </td>
+        </tr>
+    {{/each}}
+</script>
+{% endraw %}
+</body>
+</html>

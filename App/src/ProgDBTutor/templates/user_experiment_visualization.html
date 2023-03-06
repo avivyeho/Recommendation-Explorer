@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+
+    <!-- Chosen -->
+    <script src="{{ url_for('static',filename='chosen.jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='component-chosen.min.css') }}">
+
+    <!-- Experiment Logic -->
+    <script src="{{ url_for('static',filename='experiment/visualization-logic.js') }}"></script>
+
+    <!-- JS Templating using Handlebars -->
+    <script src="{{ url_for('static',filename='handlebars.min-v4.7.7.js') }}"></script>
+
+    <!-- Chart.js responsible for the graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+<div class="container-fluid mt-2">
+    <div class="row justify-content-between mb-2">
+        <a class="btn btn-outline-primary col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+           href="/user/experiments">
+            Back to experiments
+        </a>
+        <div>
+            <button type="button" class="btn btn-outline-primary mr-2" id="toggleGraphs"
+                    data-toggle="modal" data-target="#graphModal">Show Graphs</button>
+            <button type="button" class="btn btn-outline-primary" id="toggleMode">Show Images</button>
+        </div>
+    </div>
+
+
+    <div class="row justify-content-between">
+        <h4 class=""><span class="text-secondary mr-2">Name:</span><span id="experimentName"></span></h4>
+    </div>
+
+    <div class="row justify-content-between mb-2">
+        <h4 class=""><span class="text-secondary mr-2">Model:</span><span id="modelName"></span></h4>
+
+        <div>
+            <div class="btn-group mr-2 d-none" id="addScenarioUser">
+                <button type="button" class="btn btn-outline-success dropdown-toggle" id="dropdownMenuOffset2" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    Add Scenario User
+                </button>
+                <div class="dropdown-menu " aria-labelledby="dropdownMenuOffset2">
+                    <a class="dropdown-item createRandom" data-user="scenario">Random User</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#addUserWithIdModal" data-user="scenario">User with ID</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#addUsersWithItemModal" data-user="scenario">All users with item x</a>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-success dropdown-toggle" id="dropdownMenuOffset" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    Add Experiment User
+                </button>
+                <div class="dropdown-menu " aria-labelledby="dropdownMenuOffset">
+                    <a class="dropdown-item" id="createEmptyUser" data-user="experiment">Empty User</a>
+                    <a class="dropdown-item createRandom" data-user="experiment">Random User</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#addUserWithIdModal" data-user="experiment">User with ID</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#addUserWithRandomItemsModal" data-user="experiment">User with random
+                        Items</a>
+                    <a class="dropdown-item" data-toggle="modal" data-target="#addUsersWithItemModal" data-user="experiment">All users with item x</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="input-group mb-2">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Search:</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Recommendations | History"
+               id="searchUsers">
+    </div>
+
+    <div class="table-responsive text-nowrap" style="transform:rotateX(180deg);">
+        <!--Table-->
+        <table class="table table-bordered" style="border-bottom-width: 3px; transform:rotateX(180deg);">
+            <!--Table head-->
+            <thead>
+            <tr class="d-flex" id="userNameCollectionView">
+                <!-- TODO Needs to grab all the User names-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="d-flex" id="userCollectionView">
+                <!-- TODO Needs to grab all the User names-->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modals -->
+
+
+<!-- Graph Modal -->
+<div class="modal fade" id="graphModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog mw-100 mw-75" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Graphs</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <canvas id="chart-one"></canvas>
+                </div>
+            </div>
+            <br/>
+            <div class="row mt-2">
+                <div class="col-12" >
+                    <canvas id="chart-two"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-2">
+                    <canvas id="chart-three"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-2">
+                    <canvas id="chart-four"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 mt-2">
+                    <canvas id="chart-five"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add user with ID Modal -->
+<div class="modal fade" id="addUserWithIdModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="addUserWithId">
+                <div class="modal-body">
+                    Select ID
+                    <select name="id_selector" id="idSelector"
+                            class="form-control form-control-chosen form-control-chosen-required"
+                            data-placeholder="Please select an item" required>
+                        <option></option>
+                    </select>
+                    <div class="invalid-feedback" id="idSelectorInvalidFeedback">
+                        You need to select an ID!
+                    </div>
+                    <div class="valid-feedback" id="idSelectorValidFeedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button id="submitAddUserWithId" type="button" class="btn btn-success">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form id="addItem">
+                <div class="modal-body">
+                    Select Item
+                    <select name="dataset_selector" id="itemSelector"
+                            class="form-control form-control-chosen form-control-chosen-required"
+                            data-placeholder="Please select an item" required>
+                        <option></option>
+                    </select>
+                    <div class="invalid-feedback" id="itemSelectorInvalidFeedback">
+                        You need to select an Item!
+                    </div>
+                    <div class="valid-feedback" id="itemSelectorValidFeedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button id="submitAddItem" type="button" class="btn btn-success">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                Are you sure you want to delete the user?
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                <button id="confirmDeleteUser" type="button" class="btn btn-success">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Item Modal -->
+<div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="itemMetadataCollection">
+        </div>
+    </div>
+</div>
+
+<!-- Add Users with random item Modal -->
+<div class="modal fade" id="addUserWithRandomItemsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="addUserWithRandomItems">
+                <div class="modal-body">
+                    Enter amount of random items:
+                    <input type="number" class="form-control" id="randomAmount" required>
+                    <div class="invalid-feedback" id="randomAmountInvalidFeedback">
+                        Please enter a valid amount
+                    </div>
+                    <div class="valid-feedback" id="randomAmountValidFeedback">
+                        Looks good!
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button id="submitCreateUserWithRI" type="button" class="btn btn-success">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add all users with item X -->
+<div class="modal fade" id="addUsersWithItemModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="addUsersWithItem">
+                <div class="modal-body">
+                    Select Item
+                    <select name="dataset_selector" id="itemSelectorAddUser"
+                            class="form-control form-control-chosen form-control-chosen-required"
+                            data-placeholder="Please select..." required>
+                        <option></option>
+                    </select>
+                    <div class="invalid-feedback" id="itemSelectorInvalidFeedback">
+                        You need to select an Item!
+                    </div>
+                    <div class="valid-feedback" id="itemSelectorValidFeedback">
+                        Looks good!
+                    </div>
+                    Max users that should be added:
+                    <input type="number" class="form-control" id="userAmount">
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button id="submitAddUserWithItem" type="button" class="btn btn-success">Add Users</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Template -->
+{% raw %}
+<script id="itemMedataCollectionView" type="text/x-handlebars-template">
+    <div class="modal-header">
+        <h4 class="modal-title" id="itemModalTitle">{{item}}</h4>
+        <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <h4 class="">Statistics</h4>
+        <div class="row justify-content-between">
+            <h6 class=""><span class="text-secondary mr-2">First Interaction:</span>{{firstInteraction}}</h6>
+        </div>
+        <div class="row justify-content-between">
+            <h6 class=""><span class="text-secondary mr-2">Popularity</span>{{popularity}}</h6>
+        </div>
+        <hr class="m-1">
+        <h4 class="">Metadata</h4>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Search:</span>
+            </div>
+            <input type="text" class="form-control" placeholder="Meaning | Value"
+                   aria-label="Username"
+                   aria-describedby="basic-addon1" id="itemSearchFieldInput">
+        </div>
+        <table class="col-12 table-sm table-bordered metadata">
+            <thead>
+            <tr>
+                <th>Meaning</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each row}}
+                <tr class="metadataRow">
+                    <td>{{meaning}}</td>
+                    {{#if data-type}}
+                        <td><img src="{{value}}" alt="{{value}}" width="200"></td>
+                    {{/if}}
+                    {{#unless  data-type}}
+                        <td>{{value}}</td>
+                    {{/unless }}
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+</script>
+
+<script id="userNameCollectionTemplate" type="text/x-handlebars-template">
+    <!--
+    {{#each user}}
+        <th class="-w-25 col-auto -col-sm-12 -col-md-3">ID:{{id}}</th>
+    {{/each}}
+    -->
+</script>
+
+<script id="userCollectionTemplate" type="text/x-handlebars-template">
+    {{#each user}}
+        <td class="-w-25 col-auto -col-sm-12 -col-md-3 p-4 userRep">
+            {{#if recallAtK}}
+                <div class="mb-2 h5">
+                    <span class="text-secondary">Scenario User ID: </span>{{staticId}}
+                </div>
+                <div class="mb-2 h5">
+                    <span class="text-secondary">Recall@K: </span>{{recallAtK}}
+                </div>
+            {{/if}}
+            {{#unless recallAtK}}
+                <div class="mb-2 h5">
+                    <span class="text-secondary">Experiment User ID: </span>{{id}}
+                </div>
+            {{/unless}}
+
+            <hr class="mb-2">
+            <div class="row justify-content-sm-between">
+                {{#if recallAtK}}
+                    <button class="btn-sm btn-outline-danger btn col-12  mb-2"
+                            data-toggle="modal" data-target="#deleteUserModal" data-user-id="{{id}}">Remove User
+                    </button>
+                {{/if}}
+                {{#unless recallAtK}}
+                    <button class="btn-sm btn-outline-success btn col-12 mr-2 col-md-auto mb-2 copyUser"
+                            data-user-id="{{id}}">Copy User
+                    </button>
+                    <button class="btn-sm btn-outline-danger btn col-12 mr-2 col-md-auto mb-2"
+                            data-toggle="modal" data-target="#deleteUserModal" data-user-id="{{id}}">Delete User
+                    </button>
+                    <button class="btn-sm btn-outline-primary btn col-12 col-md-auto mb-2"
+                            data-toggle="modal" data-target="#addItemModal" data-user-id="{{id}}">Add item
+                    </button>
+                {{/unless}}
+            </div>
+            <hr class="m-0">
+            <div class="row mt-2">
+                <h5 class="">Recommendations</h5>
+            </div>
+            <div class="row">
+                <table class="col-12 table-sm">
+                    <thead>
+                    <tr>
+                        {{#unless recallAtK}}
+                            <th></th>
+                        {{/unless}}
+                        <th class="text-center">Item</th>
+                        <th class="text-center">%</th>
+                        {{#if recallAtK}}
+                            <th class="text-center">Correct</th>
+                        {{/if}}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each recommendation}}
+                        <tr class="text-center">
+                            {{#unless correct_recommendation}}
+                                <th>
+                                    <div style="cursor:pointer" data-user-id="{{../id}}"
+                                         data-item-name="{{item}}" class="addRecommendation">+
+                                    </div>
+                                </th>
+                            {{/unless}}
+                            <td>
+                                {{#if image_representation}}
+                                    <img class="imgRep" src="{{image_representation}}" alt="{{image_representation}}"
+                                         width="200"
+                                         data-toggle="modal" style="cursor:pointer"
+                                         data-target="#itemModal"
+                                         data-item-id="{{item}}">
+                                {{/if}}
+
+                                <span class="btn-link textRep" data-toggle="modal"
+                                      data-target="#itemModal" style="cursor:pointer"
+                                      data-item-id="{{item}}">{{text_representation}}</span>
+                            </td>
+                            <th>{{stat}}</th>
+                            {{#if correct_recommendation}}
+                                <td class="text-center">{{correct_recommendation}}</td>
+                            {{/if}}
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{#unless validationIn}}
+                <!-- History -->
+                <div class="row mt-2">
+                    <h5 class="">History</h5>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Search:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Item"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1"
+                           data-user-id="{{id}}"
+                           id="historySearchFieldInput">
+                </div>
+                <div class="row">
+                    <table class="col-12 table-sm history{{id}}">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th class="text-center">Item</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each historyItem}}
+                            <tr class="historyRow text-center">
+                                <td>
+                                    <div class="deleteItem" style="cursor:pointer"
+                                         data-user-id="{{../id}}"
+                                         data-item-id="{{itemId}}"
+                                         data-timestamp="{{time}}">&times
+                                    </div>
+                                </td>
+                                <td>
+                                    {{#if image_representation}}
+                                        <img class="imgRep" src="{{image_representation}}" alt="{{image_representation}}"
+                                             width="200"
+                                             data-toggle="modal" style="cursor:pointer"
+                                             data-target="#itemModal"
+                                             data-item-id="{{itemId}}">
+                                    {{/if}}
+
+                                    <span class="btn-link textRep" data-toggle="modal"
+                                          data-target="#itemModal" style="cursor:pointer"
+                                          data-item-id="{{itemId}}">{{text_representation}}</span>
+                                </td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/unless}}
+            {{#if validationOut}}
+                <!-- Validation Out -->
+                <div class="row mt-2">
+                    <h5 class="">Validation Out</h5>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Search:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Item"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1"
+                           data-user-id="{{id}}"
+                           id="historySearchFieldInput">
+                </div>
+                <div class="row">
+                    <table class="col-12 table-sm history{{id}}">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Item</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each validationOut}}
+                            <tr class="historyRow text-center">
+                                <td>
+                                    {{#if image_representation}}
+                                        <img class="imgRep" src="{{image_representation}}" alt="{{image_representation}}"
+                                             width="200"
+                                             data-toggle="modal" style="cursor:pointer"
+                                             data-target="#itemModal"
+                                             data-item-id="{{itemId}}">
+                                    {{/if}}
+
+                                    <span class="btn-link textRep" data-toggle="modal"
+                                          data-target="#itemModal" style="cursor:pointer"
+                                          data-item-id="{{itemId}}">{{text_representation}}</span>
+                                </td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/if}}
+            {{#if validationIn}}
+                <!-- Validation In -->
+                <div class="row mt-2">
+                    <h5 class="">Validation In</h5>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Search:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Item"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1"
+                           data-user-id="{{id}}"
+                           id="validationInSearchFieldInput">
+                </div>
+                <div class="row">
+                    <table class="col-12 table-sm validationIn{{id}}">
+                        <thead>
+                        <tr>
+                            <th class="text-center">Item</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each validationIn}}
+                            <tr class="validationInRow text-center">
+                                <td>
+                                    {{#if image_representation}}
+                                        <img class="imgRep" src="{{image_representation}}" alt="{{image_representation}}"
+                                             width="200"
+                                             data-toggle="modal" style="cursor:pointer"
+                                             data-target="#itemModal"
+                                             data-item-id="{{itemId}}">
+                                    {{/if}}
+
+                                    <span class="btn-link textRep" data-toggle="modal"
+                                          data-target="#itemModal" style="cursor:pointer"
+                                          data-item-id="{{itemId}}">{{text_representation}}</span>
+                                </td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{/if}}
+            <div class="invisible">
+                <!-- Tells the col-auto to be a bit wider giving everything more space ------------------------------------------------ -->
+            </div>
+        </td>
+    {{/each}}
+</script>
+{% endraw %}
+</body>
+</html>

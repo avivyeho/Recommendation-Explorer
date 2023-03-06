@@ -1,0 +1,106 @@
+/* Author: Joshua Moelans
+   Simple css */
+@import "https://fonts.googleapis.com/css2?family=Montserrat&display=swap";
+@import "https://fonts.googleapis.com/css2?family=Comfortaa&display=swap";
+
+p {
+    font-family: Inter,sans-serif;
+    font-size: 12pt;
+}
+
+h1 {
+    font-family: Inter, sans-serif;
+    font-size: 20pt;
+}
+
+#logout_sidebar_button {
+    position: absolute;
+    display: inline-block;
+    bottom: 30px;
+    left: 15px;
+}
+
+.mid {
+    margin-top: 80px;
+}
+
+.titlemid {
+    text-align: center;
+    color: #093094 !important;
+    font-size: 50px;
+    font-family: Montserrat, sans-serif;
+    font-weight: 900;
+}
+
+.descr {
+    text-align: center;
+    margin-top: 60px;
+    color: #093094 !important;
+    font-family: Inter, sans-serif;
+    font-size: 30px;
+}
+
+
+.col-form-label {
+    font-family: Montserrat, sans-serif;
+}
+
+/* Navbar style copied from header*/
+.login-navbar {
+    height: 80px;
+    box-shadow: 0 4px 100px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: white !important;
+    text-align: center;
+}
+
+.navbar-brand {
+    font-size: 40px;
+    margin-left: 80px;
+    font-family: Comfortaa, sans-serif !important;
+    color: #093094 !important;
+    margin-right: 70px;
+}
+
+.login-nav-toggle {
+    margin: 0px;
+}
+
+.login-nav-link {
+    font-family: Montserrat, sans-serif;
+    color: black !important;
+    font-size: 30px;
+}
+
+.logreg {
+    display: none;
+}
+
+@media screen and (max-width: 991px) {
+    .lr {
+        display: none;
+    }
+
+    .logreg {
+        display: block;
+    }
+}
+
+.login-navbar {
+    z-index: 9999;
+}
+
+.login-btn-outline-primary {
+    font-family: Montserrat, sans-serif;
+}
+
+/*
+input {
+    /width: 100%;
+}
+*/
+
+/* Some how Bootstrap needs this else the tables will be super weird*/
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}

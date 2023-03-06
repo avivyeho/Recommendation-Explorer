@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    </head>
+    <body>
+
+    <nav class="navbar login-navbar navbar-light bg-light navbar-expand-lg">
+        <a href="/" class="navbar-brand">EARHART</a>
+        <button class="navbar-toggler login-nav-toggle" data-toggle="collapse" data-target="#navbarCollapse"><span
+                class="navbar-toggler-icon"></span></button>
+
+        <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+            <ul class="navbar-nav">
+                <li class="navbar-item">
+                    <a href="#" class="nav-link login-nav-link">Product</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="/about-us" class="nav-link login-nav-link">About us</a>
+                </li>
+                <li class="navbar-item l">
+                    <a href="/login" class="nav-link logreg login-nav-link">Login</a>
+                </li>
+                <li class="navbar-item">
+                    <a href="/signup" class="nav-link logreg login-nav-link">Sign Up</a>
+                </li>
+            </ul>
+        </div>
+
+        <a class="btn btn-outline-primary login-btn-outline-primary btn-lg lr" href="/login" role="button"
+           style=margin-right:20px>Login</a>
+        <a class="btn btn-outline-primary login-btn-outline-primary btn-lg lr" href="/signup" role="button">Sign Up</a>
+    </nav>
+
+    </body>
+</html>

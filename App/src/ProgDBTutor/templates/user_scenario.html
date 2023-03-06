@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+
+    <!-- SideNav -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidenav/sidenavstyle.css') }}">
+    <script src="{{ url_for('static',filename='sidenav/sidenavlogic.js') }}"></script>
+
+    <!-- Chosen -->
+    <script src="{{ url_for('static',filename='chosen.jquery.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='component-chosen.min.css') }}">
+
+    <!-- Scenario Logic -->
+    <script src="{{ url_for('static',filename='scenario/scenario-logic.js') }}"></script>
+
+    <!-- JS Templating using Handlebars -->
+    <script src="{{ url_for('static',filename='handlebars.min-v4.7.7.js') }}"></script>
+
+    <!-- Mask -->
+    <script src="{{ url_for('static',filename='jquery.inputmask.min.js') }}"></script>
+
+</head>
+<body>
+<!-- Intended to be a basis for the websites to come -->
+
+<div class="container-fluid">
+    <div class="col-md-8 offset-md-2">
+        {% include 'sidenav/sidenav.html' %}
+        <div class="row">
+            <div class="col mt-5">
+                <h1>Scenarios</h1>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-2">
+            <div class="col">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createScenarioModal"
+                        data-fields="plain">
+                    Add new scenario
+                </button>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-between mb-2">
+            <div class="col-sm-12 "> <!-- col-md-8 -->
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Search:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Name | Sources | References"
+                           aria-label="Username"
+                           aria-describedby="basic-addon1" id="searchFieldInput">
+                </div>
+            </div>
+            <div> <!-- This one works magic for some reason XD -->
+                <!-- Optional
+                <div class="col-md-4">
+                    <div class="dropdown show">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Sort by
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item" href="#">Name</a>
+                            <a class="dropdown-item" href="#">Source</a>
+                            <a class="dropdown-item" href="#">References: Ascending</a>
+                            <a class="dropdown-item" href="#">References: Descending</a>
+                            <a class="dropdown-item" href="#">Date: Newest First</a>
+                            <a class="dropdown-item" href="#">Date: Oldest First</a>
+                        </div>
+                    </div>
+                </div>
+                -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+
+                <table class="table table-bordered table-sm" id="table">
+                    <thead class="thead-light">
+                    <tr class="">
+                        <th scope="col" class="">Name</th>
+                        <th scope="col" class="">Sources</th>
+                        <th scope="col" class="d-none d-md-table-cell">References</th>
+                        <!-- <th scope="col" class="d-none d-md-table-cell">Date</th> -->
+                    </tr>
+                    </thead>
+                    <tbody id="collectionViewBody">
+                    <!-- These need to be loaded in dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals --->
+<!-- Change Name Modal -->
+<div class="modal fade" id="changeScenarioNameModal" tabindex="-1" role="dialog"
+     aria-labelledby="changeScenarioNameModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="changeNameForm" novalidate>
+                <div class="modal-body">
+                    <div class="row">
+                        <h6 class=""><span class="text-secondary mr-2">Current Name:</span><span
+                                id="currentName"></span></h6>
+                    </div>
+                    <div class="row">
+                        <input type="text" class="form-control" id="newScenarioNameInput"
+                               placeholder="New Scenario Name" required>
+                        <div class="invalid-feedback" id="newScenarioNameInvalidFeedback">
+                            Please enter a Valid Name.
+                        </div>
+                        <div class="valid-feedback" id="newScenarioNameValidFeedback">
+                            Looks good!
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteScenarioModal" tabindex="-1" role="dialog"
+     aria-labelledby="deleteScenarioModal"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="deleteScenario">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h6>Are you sure you want to delete the scenario?</h6>
+                    <h6><span class="text-secondary mr-2">Models using this:</span><span id="referenceValue"></span>
+                    </h6>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                    <button id="confirmDeleteScenario" type="button" class="btn btn-success">Yes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Show Interaction Sample -->
+<div class="modal fade" id="showScenarioInteraction" tabindex="-1" role="dialog"
+     aria-labelledby="showScenarioInteraction" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sample</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" id="interactionSampleBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Show Metadata Sample -->
+<div class="modal fade" id="showMetaDataSample" tabindex="-1" role="dialog"
+     aria-labelledby="showMetaDataSample" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Sample</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center" id="metaSampleBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Labels Modal -->
+<div class="modal fade" id="changeScenarioLabelsModal" tabindex="-1" role="dialog"
+     aria-labelledby="changeScenarioLabelsModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h6>Labels are for later</h6>
+                <!-- List of labels that can be selected -->
+                <!-- New Label generation -->
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Scenario Modal -->
+<div class="modal fade" id="createScenarioModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <!-- Begin Create Scenario From -->
+                <!-- <form id="createScenario" action="/" method="post"> -->
+                <form class="needs-validation" id="createScenario" novalidate>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="text-center text-primary">
+                            <th>Create Scenario</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <div class="form-row align-items-center">
+                                    <div class="col-auto">
+                                        <label class="col-form-label" for="scenarioName">Name:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="text" class="form-control" id="scenarioName" required>
+                                        <div class="invalid-feedback" id="scenarioNameInvalidFeedback">
+                                            Please enter a Valid Name
+                                        </div>
+                                        <div class="valid-feedback" id="scenarioNameValidFeedback">
+                                            Looks good!
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Pre-processing</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table class="table table-sm text-center">
+                                    <thead>
+                                    <tr class="">
+                                        <th>Min</th>
+                                        <th>From</th>
+                                        <th>Filter</th>
+                                        <th>To</th>
+                                        <th>Max</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="preProcessingCollection">
+                                        <!-- Filed dynamically -->
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-primary dropdown-toggle" id="dropdownMenuOffset"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Add Pre-processing Step
+                                </button>
+                                <div class="dropdown-menu " aria-labelledby="dropdownMenuOffset">
+                                    <a class="dropdown-item addpp" id="addppTime">Timestamp</a>
+                                    <a class="dropdown-item addpp" id="addppUser">Interactions per User</a>
+                                    <a class="dropdown-item addpp" id="addppItem">Interaction per Item</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Dataset</th>
+                            <!-- https://www.w3schools.com/howto/howto_js_autocomplete.asp -->
+                            <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist -->
+                            <!-- https://stackoverflow.com/a/33985301/8076979 -->
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-row align-items-center">
+                                    <div class="col-12">
+                                        <select name="dataset_selector" id="datasetSelector"
+                                                class="form-control form-control-chosen form-control-chosen-required"
+                                                data-placeholder="Please select..." required>
+                                            <option></option>
+                                        </select>
+                                        <div class="invalid-feedback" id="datasetSelectorInvalidFeedback">
+                                            You need to select a Dataset!
+                                        </div>
+                                        <div class="valid-feedback" id="datasetSelectorValidFeedback">
+                                            Looks good!
+                                        </div>
+                                    </div>
+                                    <!--
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-primary">Select</button>
+                                    </div>
+                                    -->
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Cross validation -->
+                        <tr>
+                            <th class="text-secondary">Cross validation</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text"
+                                               for="generalizationSelector">Generalization</label>
+                                    </div>
+                                    <select id="generalizationSelector"
+                                            class="form-control form-control-chosen-optional"
+                                            data-placeholder="Select a column ...">
+                                        <option></option>
+                                        <option value="SG">Strong Generalization</option>
+                                        <option value="WG">Weak Generalization</option>
+                                    </select>
+                                </div>
+                                <div class="form-row align-items-center g-parameter-one-section d-none mt-2">
+                                    <div class="col-auto">
+                                        <label class="col-form-label g-parameter-one-label" for="g-parameter-one">Percentage
+                                            Validation-In</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="text" class="form-control" id="g-parameter-one">
+                                    </div>
+                                </div>
+
+                                <div class="form-row align-items-center g-parameter-two-section d-none mt-2">
+                                    <div class="col-auto">
+                                        <label class="col-form-label g-parameter-two-label" for="g-parameter-two">Percentage
+                                            Training Users:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="text" class="form-control" id="g-parameter-two">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Post-processing</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value=""
+                                           id="disableRetargeting">
+                                    <label class="form-check-label" for="disableRetargeting">
+                                        Disable Retargeting
+                                    </label>
+                                    <div class="invalid-feedback" id="disableRetargetingInvalidFeedback">
+                                        You need to select a Dataset!
+                                    </div>
+                                    <div class="valid-feedback" id="disableRetargetingValidFeedback">
+                                        Looks good!
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="row justify-content-between">
+                        <button type="button" class="btn btn-danger col-md-auto cpm-12  mb-2"
+                                data-dismiss="modal">Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success col-md-auto col-12" id="createButton">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% raw %}
+<script id="sampleCollectionView" type="text/x-handlebars-template">
+    <table class="table table-sm table-bordered">
+        <thead>
+        <tr>
+            {{#each header}}
+                <th>{{this}}</th>
+            {{/each}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each row}}
+            <tr>
+                {{#each value}}
+                    <td>{{this}}</td>
+                {{/each}}
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</script>
+
+<script id="scenarioCollectionView" type="text/x-handlebars-template">
+    {{#each scenario}}
+        <tr class="scenarioRow" id="row{{@index}}" data-toggle="collapse" data-target="#collapseRow{{@index}}"
+            style="cursor:pointer">
+            <td class="">{{scenarioName}}</td>
+            <td class="">{{sourceName}}</td>
+            <td class="d-none d-md-table-cell">{{numberReferences}}</td>
+            <!-- <td class="d-none d-md-table-cell">{ {date}}</td> -->
+        </tr>
+        <tr id="collapseRow{{@index}}" class="collapse" data-parent="#accordion">
+            <td colspan="4" class="p-3">
+                <!-- Start Representation Scenario -->
+                <table class="table table-sm border-0 mb-0">
+                    <tbody>
+                    <!-- General information -->
+                    <tr class="text-primary scenario-collapse-toggles" id="headingGeneralInfo{{@index}}"
+                        data-toggle="collapse"
+                        data-target="#collapseGeneralInfo{{@index}}" style="cursor:pointer">
+                        <th>
+                            <div class="row justify-content-between">
+                                <span>General info</span><span class="mr-1" id="icon">-</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr id="collapseGeneralInfo{{@index}}" class="collapse show collapse-with-indicator">
+                        <td>
+                            <div class="row justify-content-between form-inline mb-md-auto mb-2">
+                                <h6 class="mt-2"><span class="text-secondary mr-2">Name:</span>{{scenarioName}}</h6>
+                                <!--
+                                <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                        data-toggle="modal"
+                                        data-target="#changeScenarioNameModal"
+                                        data-name="{ {scenarioName}}"
+                                        data-scenario-id={ {scenarioID}}>
+                                    Change Name
+                                </button>
+                                -->
+                            </div>
+                            <!--
+                            <div class="row">
+                                <h6 class="text-secondary mr-2">Created:</h6><h6>{ {date}}</h6>
+                            </div>
+                            -->
+                            <!-- Optional
+                            <div class="row d-flex align-items-center justify-content-between mb-md-auto mb-2">
+                                <h6>
+                                    <span class="text-secondary mr-2">Labels:</span>
+                                    <span class="badge badge-pill badge-secondary">Project #1</span>
+                                    <span class="badge badge-pill badge-secondary">Demo</span>
+                                </h6>
+                                <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                        data-toggle="modal"
+                                        data-target="#changeScenarioLabelsModal">Change Labels
+                                </button>
+                            </div>
+                            -->
+                            <div class="row">
+                                <h6><span class="text-secondary mr-2">Models using this:</span>{{numberReferences}}</h6>
+                            </div>
+
+                            <!-- Cross validation -->
+                            {{#if generalizationType}}
+                                <div class="row">
+                                    <h6><span class="text-secondary mr-2">Cross validation:</span>{{generalizationType}}
+                                    </h6>
+                                </div>
+                                <div class="row">
+                                    <h6><span class="text-secondary mr-2">Validation in:</span>{{validationIn}}</h6>
+                                </div>
+                            {{/if}}
+                            {{#if trainingUsers}}
+                                <div class="row">
+                                    <h6><span class="text-secondary mr-2">Training users:</span>{{trainingUsers}}</h6>
+                                </div>
+                            {{/if}}
+
+                            <div class="row justify-content-between form-inline">
+                                <h6 class="mt-0"><span class="text-secondary mr-2">Source:</span>{{sourceName}}</h6>
+                                <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary"
+                                        onClick="location.href='/user/datasets?search={{sourceName}}'"
+                                >Go to Dataset</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Processing steps -->
+                    <tr class="text-primary scenario-collapse-toggles" id="headingProcessingSteps{{@index}}"
+                        data-toggle="collapse" data-target="#collapseProcessingSteps{{@index}}" style="cursor:pointer">
+                        <th>
+                            <div class="row justify-content-between">
+                                <span>Processing steps</span><span class="mr-1" id="icon">+</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr id="collapseProcessingSteps{{@index}}" class="collapse collapse-with-indicator">
+                        <td>
+                            <h6 class="text-secondary">Pre-processing</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Filter</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {{#each preProcessingStep}}
+                                <tr>
+                                    <td>{{type}}</td>
+                                    <td>{{from}}</td>
+                                    <td>{{to}}</td>
+                                </tr>
+                                {{/each}}
+                                </tbody>
+                            </table>
+                            <h6 class="text-secondary">Post-processing</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Filter</th>
+                                    <th>Active</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="col">Retargeting</td>
+                                    <td class="col">{{retargetingActive}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Statistics -->
+                    <tr class="text-primary scenario-collapse-toggles" id="headingStatistics{{@index}}"
+                        data-toggle="collapse" data-target="#collapseStatistics{{@index}}" style="cursor:pointer">
+                        <th>
+                            <div class="row justify-content-between">
+                                <span>Statistics</span><span class="mr-1" id="icon">+</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr id="collapseStatistics{{@index}}" class="collapse collapse-with-indicator">
+                        <td>
+                            <h6 class="text-secondary">Quantities</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Total Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Interactions</td>
+                                    <td>{{totalInteractions}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Products</td>
+                                    <td>{{totalProducts}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Users</td>
+                                    <td>{{totalUsers}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                    <!-- Optional
+                    <h6 class="text-secondary">Ranges</h6>
+                    <table class="table table-sm">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Min</th>
+                            <th>Max</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Interactions per Product</td>
+                            <td>{ {interactionsPerProductMin}}</td>
+                            <td>{ {interactionsPerProductMax}}</td>
+                        </tr>
+                        <tr>
+                            <td>Users per Product</td>
+                            <td>{ {usersPerProductMin}}</td>
+                            <td>{ {usersPerProductMax}}</td>
+                        </tr>
+                        <tr>
+                            <td>Interactions per User</td>
+                            <td>{ {interactionsPerUserMin}}</td>
+                            <td>{ {interactionsPerUserMax}}</td>
+                        </tr>
+                        <tr>
+                            <td>Products per User</td>
+                            <td>{ {productsPerUserMin}}</td>
+                            <td>{ {productsPerUserMax}}</td>
+                        </tr>
+                        <tr>
+                            <td>Interactions per Moment</td>
+                            <td>{ {interactionsPerMomentMin}}</td>
+                            <td>{ {interactionsPerMomentMax}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    -->
+                    <!--
+                            <button class="btn btn-primary col-md-auto col-sm-12 mb-md-auto mb-2 btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#showScenarioInteraction"
+                                    data-scenario-name="{{scenarioName}}"
+                                    data-scenario-id={{scenarioID}}>
+                                Show Interactions Sample
+                            </button>
+                        </td>
+                    </tr> -->
+
+                    <!-- Metadata --> <!--
+                    <tr class="text-primary scenario-collapse-toggles" id="headingMetadata{{@index}}"
+                        data-toggle="collapse"
+                        data-target="#collapseMetadata{{@index}}" style="cursor:pointer">
+                        <th>
+                            <div class="row justify-content-between">
+                                <span>Metadata</span><span class="mr-1" id="icon">+</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr id="collapseMetadata{{@index}}" class="collapse collapse-with-indicator">
+                        <td>
+
+                            {{#each metaFile}}
+                                <div class="row justify-content-between form-inline mb-2 mt-2">
+                                    <h6 class="mt-2"><span class="text-secondary mr-2">Name:</span>{{fileName}}
+                                    </h6>
+                                    <button class="col-md-auto col-sm-12 btn btn-sm btn btn-primary" data-toggle="modal"
+                                            data-target="#showMetaDataSample"
+                                            data-meta-file-name="{{fileName}}"
+                                            data-scenario-name="{{../scenarioName}}"
+                                            data-scenario-id={{../scenarioID}}>
+                                        Show Sample
+                                    </button>
+                                </div>
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Meaning</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {{#each column}}
+                                        <tr>
+                                            <th scope="row">{{@index}}</th>
+                                            <td>{{type}}</td>
+                                            <td>{{meaning}}</td>
+                                        </tr>
+                                    {{/each}}
+                                    </tbody>
+                                </table>
+                            {{/each}}
+                        </td>
+                    </tr>
+                    -->
+                    <!-- Buttons -->
+                    <tr>
+                        <td>
+                            <div class="row justify-content-between">
+                                <button class="btn btn-success col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                        onClick="location.href='/user/models?create={{scenarioName}},{{scenarioID}}'"
+                                data-scenario-name="{{scenarioName}}"
+                                data-scenario-id={{scenarioID}}>
+                                Create Model
+                                </button>
+                                <button class="btn btn-success col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                        data-toggle="modal" data-target="#createScenarioModal"
+                                        data-fields="filed"
+                                        data-scenario-name="{{scenarioName}}"
+                                        data-scenario-id={{scenarioID}}>
+                                    Copy Scenario
+                                </button>
+                                <button class="btn btn-danger col-md-auto col-sm-12 mb-md-auto mb-2 btn"
+                                        data-toggle="modal"
+                                        data-target="#deleteScenarioModal"
+                                        data-scenario-name="{{scenarioName}}"
+                                        data-scenario-id={{scenarioID}}>
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!-- End Representation Scenario -->
+            </td>
+        </tr>
+    {{/each}}
+</script>
+{% endraw %}
+</body>
+</html>
+

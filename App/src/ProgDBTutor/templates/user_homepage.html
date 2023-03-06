@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- SideNav -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidenav/sidenavstyle.css') }}">
+    <script src="{{ url_for('static',filename='sidenav/sidenavlogic.js') }}"></script>
+
+</head>
+<body>
+<div class="container-fluid">
+    {% include 'sidenav/sidenav.html' %}
+    <div class="col-md-8 offset-md-2">
+        <div class="row">
+            <div class="col mt-5">
+                <h1>Hello {{ current_user.username }}</h1>
+            </div>
+        </div>
+        <hr>
+        <!--
+        <div class="row mb-2">
+            <div class="col">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="col-12 d-flex justify-content-between align-items-center">
+                            <h4>Recent Activity </h4>
+                            <span class="badge badge-primary ">4</span>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Created Dataset #1</h6>
+                                    <small>0 days ago</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Created Dataset #2</h6>
+                                    <small>1 days ago</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Created Experiment #3</h6>
+                                    <small>2 days ago</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Shared Experiment #3 with @gard</h6>
+                                    <small>3 days ago</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li href="#" class="list-group-item">
+                        <div class="col-12 d-flex justify-content-between align-items-center">
+                            <h4>Shared with you </h4>
+                            <span class="badge badge-primary ">2</span>
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@Albert shared Experiment: Relativity</h6>
+                                    <small>1 days ago</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@Walt shared Dataset: O me! O life!</h6>
+                                    <small>5 days ago</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div> -->
+    </div>
+</div>
+</body>
+</html>

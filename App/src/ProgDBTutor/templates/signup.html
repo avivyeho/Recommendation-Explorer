@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!-- Title of the current page will appear in some browser tabs -->
+    <title>Earhart</title>
+    <!-- Done so that the website renders properly on phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Is used as a part of the snippet shown in the search results -->
+    <meta name="description" content="Home page of Earhart">
+    <!-- Icons used all over the place -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Link to CSS, should be boostrap and a css with any special changes -->
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap-4.0.0.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='mystyle.css') }}">
+    <!-- Link to JavasScript, should be boostrap, jquery, and any additional js files -->
+    <script src="{{ url_for('static',filename='jquery-3.2.1.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap-4.0.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <style>
+        .SignupWindow {
+            margin-top: 20px;
+            box-shadow: 0px 0px 5px 5px lightgray;
+        }
+        .CenterAligned {
+            text-align: center;
+        }
+    </style>
+    <script>
+        function onChange() {
+            const password = document.getElementById('Password');
+            const confirm = document.getElementById('Cpassword');
+            if (confirm.value === password.value) {
+                confirm.setCustomValidity('');
+            } else {
+                confirm.setCustomValidity('Passwords do not match');
+            }
+        }
+
+        function UserExist() {
+            var result = [];
+            let username = $("#Username").val();
+            let email = $("#EmailAddress").val();
+            $.ajax({
+                url: "/API/signup",
+                method: "POST",
+                timeout: 0,
+                headers: {"Content-Type": "application/json"},
+                data: JSON.stringify({'username': username, 'email': email}),
+                async: false,
+                success: function (data) {
+                    items = data
+                }
+            });
+            result = items;
+            console.log(result);
+
+            const user = document.getElementById('Username');
+            const emailid = document.getElementById('EmailAddress');
+
+            if (result["message"] === "User already taken") {
+                user.setCustomValidity('Username already taken');
+            } else if (result["message"] === "Email already taken") {
+                user.setCustomValidity('');
+                emailid.setCustomValidity('Email already taken');
+            }else if (result["message"] === "Insert all required fields"){
+                emailid.setCustomValidity('');
+                user.setCustomValidity('');
+            }
+        }
+
+
+    </script>
+</head>
+<body>
+<!-- included header -->
+{% include 'header.html' %}
+
+{% if current_user.is_authenticated %}
+<script> window.location.replace("/user")</script>
+{% endif %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-4"></div>
+        <div class="col-md-6 col-lg-4 SignupWindow">
+            <form id="addUserForm" action="/API/signup" method="post">
+                <label class="col-sm-12 col-form-label" for="Fullname">Fullname</label>
+                <div class="col-sm-12">
+                    <input type="text" style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;"
+                           class="form-control" name="Fullname" id="Fullname" required>
+                </div>
+                <label class="col-sm-12 col-form-label" for="Username">Username</label>
+                <div class="col-sm-12">
+                    <input type="text" style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;"
+                           class="form-control" name="Username" onchange="UserExist()" id="Username" required>
+                </div>
+                <label class="col-sm-12 col-form-label" for="EmailAddress">Email address</label>
+                <div class="col-sm-12">
+                    <input type="text" style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;"
+                           class="form-control" name="EmailAddress" onchange="UserExist()" id="EmailAddress" required>
+                </div>
+                <label class="col-sm-12 col-form-label" for="Password">Password</label>
+                <div class="col-sm-12">
+                    <input type="password" style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;"
+                           class="form-control" name="Password" onChange="onChange()" id="Password" required>
+                </div>
+                <label class="col-sm-12 col-form-label" for="Cpassword">Confirm password
+                </label>
+                <div class="col-sm-12">
+                    <input type="password" style="background-color: rgba(0, 0, 0, 0.05); border-color: grey;"
+                           class="form-control" onChange="onChange()" name="Cpassword" id="Cpassword" required>
+                </div>
+                <div class="col-sm-12" style="margin-top:15px;">
+                    <input type ="submit" value="Sign Up" class="btn btn-primary col-sm-12" style="text-align: center;" required />
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="CenterAligned">
+                        <p>
+                            Already have an account?
+                            <a href="/login" style="text-decoration-color: dodgerblue">
+                                Login
+                            </a>
+                        </p>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-4"></div>
+    </div>
+</div>
+</body>
+</html>
